@@ -29,8 +29,7 @@ public class UserController extends BaseController {
 
     @RequestMapping(value = "/user/findall", method = RequestMethod.GET)
     public @ResponseBody List<UserDTO> getAllUser() {
-        List<UserDTO> alluser = userService.findAllUser();
-        return alluser;
+        return userService.findAllUser();
     }
 
     @RequestMapping(value = "/user/register", method = RequestMethod.POST)
