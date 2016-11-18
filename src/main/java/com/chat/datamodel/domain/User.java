@@ -32,6 +32,9 @@ public class User {
     @Column(name = "createTime")
     private String createTime;
 
+    @Column(name = "valid")
+    private int valid;
+
     public int getUserId() {
         return userId;
     }
@@ -62,5 +65,13 @@ public class User {
 
     public void setCreateTime(String createTime) {
         this.createTime = createTime;
+    }
+
+    public int getValid() {
+        return valid;
+    }
+
+    public void setValid(int valid) {
+        this.valid = valid;
     }
 }

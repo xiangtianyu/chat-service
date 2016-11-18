@@ -25,7 +25,7 @@ public class UserService extends BaseService {
 
 
     public List<UserDTO> findAllUser() {
-        List<User> user = userDao.findAll();
+        List<User> user = userDao.findAllByValid(1);
 
         List<UserDTO> alluser = new ArrayList<UserDTO>();
 
@@ -41,7 +41,7 @@ public class UserService extends BaseService {
         if (!checkDateFormat(createTime)) {
             throw new IllegalArgumentException("timeFomat error");
         }
-        if (userDao.findUserByUserName(username) != null) {
+        if (userDao.findUserByUserNameAndValid(username, 1) != null) {
             res.setResult(1);
             res.setMessage("用户已存在");
             res.setUid(-1);
@@ -51,17 +51,18 @@ public class UserService extends BaseService {
         user.setUserName(username);
         user.setPassWord(password);
         user.setCreateTime(createTime);
+        user.setValid(1);
         userDao.save(user);
 
         res.setResult(0);
         res.setMessage("用户创建成功");
-        res.setUid(userDao.findUserByUserName(username).getUserId());
+        res.setUid(userDao.findUserByUserNameAndValid(username, 1).getUserId());
         return res;
     }
 
     public ResultDTO uLogin(String username, String password) {
         ResultDTO res = new ResultDTO();
-        User user = userDao.findUserByUserName(username);
+        User user = userDao.findUserByUserNameAndValid(username, 1);
         if (user == null) {
             res.setResult(1);
             res.setMessage("用户不存在");
@@ -78,6 +79,24 @@ public class UserService extends BaseService {
         res.setResult(0);
         res.setMessage("登录成功");
         res.setUid(user.getUserId());
+        return res;
+    }
+
+    public ResultDTO uDelete(int uid) {
+        ResultDTO res = new ResultDTO();
+        User user = userDao.findUserByUserIdAndValid(uid, 1);
+        if (user == null) {
+            res.setResult(1);
+            res.setMessage("用户不存在");
+            res.setUid(-1);
+            return res;
+        }
+        user.setValid(0);
+        userDao.save(user);
+
+        res.setResult(0);
+        res.setMessage("用户删除成功");
+        res.setUid(uid);
         return res;
     }
 

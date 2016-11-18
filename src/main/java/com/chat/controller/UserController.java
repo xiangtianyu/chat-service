@@ -27,9 +27,8 @@ public class UserController extends BaseController {
     @Autowired
     private UserService userService;
 
-    @ResponseBody
     @RequestMapping(value = "/user/findall", method = RequestMethod.GET)
-    public List<UserDTO> getAllUser() {
+    public @ResponseBody List<UserDTO> getAllUser() {
         List<UserDTO> alluser = userService.findAllUser();
         return alluser;
     }
@@ -44,6 +43,11 @@ public class UserController extends BaseController {
     public @ResponseBody ResultDTO uLogin(@RequestBody UserLoginParameterContext userLoginParameterContext) throws ParseException {
         return userService.uLogin(userLoginParameterContext.getUsername(),
                 userLoginParameterContext.getPassword());
+    }
+
+    @RequestMapping(value = "/user/delete", method = RequestMethod.GET)
+    public @ResponseBody ResultDTO uDelete(int uid) {
+        return userService.uDelete(uid);
     }
 
 }

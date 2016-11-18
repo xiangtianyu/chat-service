@@ -10,8 +10,10 @@ import org.springframework.data.repository.CrudRepository;
 import com.chat.datamodel.domain.User;
 
 public interface UserDao extends CrudRepository<User, Long> {
-    public List<User> findAll();
+    public List<User> findAllByValid(int valid);
 
-    public User findUserByUserName(String userName);
+    public User findUserByUserNameAndValid(String userName, int valid);
+
+    public User findUserByUserIdAndValid(int userId, int valid);
 
 }
