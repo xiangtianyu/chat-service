@@ -29,6 +29,9 @@ public class User {
     @Column(name = "password")
     private String passWord;
 
+    @Column(name = "createTime")
+    private String createTime;
+
     public int getUserId() {
         return userId;
     }
@@ -51,5 +54,13 @@ public class User {
 
     public void setPassWord(String passWord) {
         this.passWord = passWord;
+    }
+
+    public String getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
     }
 }

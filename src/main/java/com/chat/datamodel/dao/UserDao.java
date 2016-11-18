@@ -12,4 +12,6 @@ import com.chat.datamodel.domain.User;
 public interface UserDao extends CrudRepository<User, Long> {
     public List<User> findAll();
 
+    public User findUserByUserName(String userName);
+
 }

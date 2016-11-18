@@ -8,6 +8,8 @@ public class UserDTO {
 
     private String      passWord;
 
+    private String      createTime;
+
     public int getUid() {
         return uid;
     }
@@ -30,5 +32,13 @@ public class UserDTO {
 
     public void setPassWord(String passWord) {
         this.passWord = passWord;
+    }
+
+    public String getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
     }
 }

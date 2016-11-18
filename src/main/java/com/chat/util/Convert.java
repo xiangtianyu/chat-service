@@ -12,6 +12,7 @@ public class Convert {
         userDTO.setUid(user.getUserId());
         userDTO.setUserName(user.getUserName());
         userDTO.setPassWord(user.getPassWord());
+        userDTO.setCreateTime(user.getCreateTime());
         return userDTO;
     }
 }
