@@ -5,11 +5,13 @@ import java.util.List;
 import java.util.*;
 import java.text.ParseException;
 
+import com.chat.datamodel.dto.UserInfoDTO;
 import com.chat.service.UserService;
 import com.chat.datamodel.dto.UserDTO;
 import com.chat.datamodel.dto.ResultDTO;
 import com.chat.datamodel.parameter.UserRegisterParameterContext;
 import com.chat.datamodel.parameter.UserLoginParameterContext;
+import com.chat.datamodel.parameter.UserAddFriendParameterContext;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -47,6 +49,23 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/user/delete", method = RequestMethod.GET)
     public @ResponseBody ResultDTO uDelete(int uid) {
         return userService.uDelete(uid);
+    }
+
+    @RequestMapping(value = "/friend/add", method = RequestMethod.POST)
+    public @ResponseBody ResultDTO addFriend(@RequestBody UserAddFriendParameterContext userAddFriendParameterContext) throws ParseException {
+        return userService.addFriend(userAddFriendParameterContext.getUid(),
+                userAddFriendParameterContext.getFid(), userAddFriendParameterContext.getCreateTime());
+    }
+
+    @RequestMapping(value = "/friend/delete", method = RequestMethod.POST)
+    public @ResponseBody ResultDTO deleteFriend(@RequestBody UserAddFriendParameterContext userAddFriendParameterContext) throws ParseException {
+        return userService.deleteFriend(userAddFriendParameterContext.getUid(),
+                userAddFriendParameterContext.getFid());
+    }
+
+    @RequestMapping(value = "/friend/getFriends", method = RequestMethod.GET)
+    public @ResponseBody List<UserInfoDTO> getFriends(int uid) {
+        return userService.getFriends(uid);
     }
 
 }
