@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50621
 File Encoding         : 65001
 
-Date: 2016-11-18 15:53:35
+Date: 2016-11-21 16:21:44
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -57,3 +57,22 @@ INSERT INTO `user_relationship` VALUES ('1', '1', '2', '2016-11-18', '0');
 INSERT INTO `user_relationship` VALUES ('2', '3', '1', '2016-11-18', '1');
 INSERT INTO `user_relationship` VALUES ('3', '3', '4', '2016-11-18', '1');
 INSERT INTO `user_relationship` VALUES ('4', '3', '2', '2016-11-18', '1');
+
+-- ----------------------------
+-- Table structure for `whitelist`
+-- ----------------------------
+DROP TABLE IF EXISTS `whitelist`;
+CREATE TABLE `whitelist` (
+  `id` int(20) NOT NULL AUTO_INCREMENT,
+  `ip` varchar(45) DEFAULT NULL,
+  `isAuto` int(8) DEFAULT NULL,
+  `sTime` varchar(45) DEFAULT NULL,
+  `eTime` varchar(45) DEFAULT NULL,
+  `valid` int(8) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of whitelist
+-- ----------------------------
+INSERT INTO `whitelist` VALUES ('1', '0:0:0:0:0:0:0:1', '1', null, null, '1');

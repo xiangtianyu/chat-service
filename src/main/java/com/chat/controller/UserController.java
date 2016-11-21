@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.*;
 import java.text.ParseException;
 
+import com.chat.assist.WhiteList;
 import com.chat.datamodel.dto.UserInfoDTO;
 import com.chat.service.UserService;
 import com.chat.datamodel.dto.UserDTO;
@@ -22,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+
 @CrossOrigin
 @RestController
 public class UserController extends BaseController {
@@ -29,8 +32,9 @@ public class UserController extends BaseController {
     @Autowired
     private UserService userService;
 
+    @WhiteList()
     @RequestMapping(value = "/user/findall", method = RequestMethod.GET)
-    public @ResponseBody List<UserDTO> getAllUser() {
+    public @ResponseBody List<UserDTO> getAllUser(HttpServletRequest request) {
         return userService.findAllUser();
     }
 
@@ -46,6 +50,7 @@ public class UserController extends BaseController {
                 userLoginParameterContext.getPassword());
     }
 
+    @WhiteList()
     @RequestMapping(value = "/user/delete", method = RequestMethod.GET)
     public @ResponseBody ResultDTO uDelete(int uid) {
         return userService.uDelete(uid);
@@ -63,6 +68,7 @@ public class UserController extends BaseController {
                 userAddFriendParameterContext.getFid());
     }
 
+    @WhiteList()
     @RequestMapping(value = "/friend/getFriends", method = RequestMethod.GET)
     public @ResponseBody List<UserInfoDTO> getFriends(int uid) {
         return userService.getFriends(uid);
