@@ -1,5 +1,7 @@
 package com.chat.service;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.*;
@@ -12,6 +14,7 @@ import com.chat.datamodel.dto.ResultDTO;
 import com.chat.datamodel.domain.User;
 
 import com.chat.datamodel.dto.UserInfoDTO;
+import com.sun.org.apache.xml.internal.security.algorithms.JCEMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,9 +45,18 @@ public class UserService extends BaseService {
         return alluser;
     }
 
-    public ResultDTO uRegister(String username, String password, String createTime) {
+    public ResultDTO uRegister(String username, String password, String createTime) throws NoSuchAlgorithmException{
         ResultDTO res = new ResultDTO();
-        if (!checkDateFormat(createTime)) {
+        MessageDigest sha256Digest = MessageDigest.getInstance("SHA-256");
+        byte[] rSalt = Convert.createRandomSalt();
+        String sSalt = Convert.byteToHexString(rSalt);
+        String pw = password + Constrain.Salt + sSalt;
+
+        byte[] sha256Encode = sha256Digest.digest(pw.getBytes());
+
+        String shaPW = Convert.byteToHexString(sha256Encode);
+
+        if (!Convert.checkDateFormat(createTime)) {
             throw new IllegalArgumentException("DateFomat error");
         }
         if (userDao.findUserByUserNameAndValid(username, 1) != null) {
@@ -55,8 +67,9 @@ public class UserService extends BaseService {
         }
         User user = new User();
         user.setUserName(username);
-        user.setPassWord(password);
+        user.setPassWord(shaPW);
         user.setCreateTime(createTime);
+        user.setSalt(sSalt);
         user.setValid(1);
         userDao.save(user);
 
@@ -66,16 +79,58 @@ public class UserService extends BaseService {
         return res;
     }
 
-    public ResultDTO uLogin(String username, String password) {
+    public ResultDTO uUpdate(int uid, String password) throws NoSuchAlgorithmException{
         ResultDTO res = new ResultDTO();
-        User user = userDao.findUserByUserNameAndValid(username, 1);
+
+        User user = userDao.findUserByUserIdAndValid(uid, 1);
+
+        MessageDigest sha256Digest = MessageDigest.getInstance("SHA-256");
+        byte[] rSalt = Convert.createRandomSalt();
+        String sSalt = Convert.byteToHexString(rSalt);
+        String pw = password + Constrain.Salt + sSalt;
+
+        byte[] sha256Encode = sha256Digest.digest(pw.getBytes());
+
+        String shaPW = Convert.byteToHexString(sha256Encode);
+
         if (user == null) {
             res.setResult(1);
             res.setMessage("用户不存在");
             res.setUid(-1);
             return res;
         }
-        if (!password.equals(user.getPassWord())) {
+
+        user.setPassWord(shaPW);
+        user.setSalt(sSalt);
+        user.setValid(1);
+        userDao.save(user);
+
+        res.setResult(0);
+        res.setMessage("用户更新成功");
+        res.setUid(uid);
+        return res;
+    }
+
+    public ResultDTO uLogin(String username, String password) throws NoSuchAlgorithmException{
+        ResultDTO res = new ResultDTO();
+        User user = userDao.findUserByUserNameAndValid(username, 1);
+
+        if (user == null) {
+            res.setResult(1);
+            res.setMessage("用户不存在");
+            res.setUid(-1);
+            return res;
+        }
+
+        MessageDigest sha256Digest = MessageDigest.getInstance("SHA-256");
+        String sSalt = user.getSalt();
+        String pw = password + Constrain.Salt + sSalt;
+
+        byte[] sha256Encode = sha256Digest.digest(pw.getBytes());
+
+        String shaPW = Convert.byteToHexString(sha256Encode);
+
+        if (!shaPW.equals(user.getPassWord())) {
             res.setResult(2);
             res.setMessage("用户名密码错误");
             res.setUid(-1);
@@ -106,57 +161,12 @@ public class UserService extends BaseService {
         return res;
     }
 
-    private boolean checkTimeFormat(String date) {
-        if (date.length() != Constrain.TimeFormat.length())
-            return false;
-        for (int i = 0; i < date.length(); i++) {
-            switch (i) {
-                case 4:
-                case 7:
-                    if (date.toCharArray()[i] != '-')
-                        return false;
-                    break;
-                case 10:
-                    if (date.toCharArray()[i] != ' ')
-                        return false;
-                    break;
-                case 13:
-                case 16:
-                    if (date.toCharArray()[i] != ':')
-                        return false;
-                    break;
-                default:
-                    if (!Character.isDigit(date.toCharArray()[i]))
-                        return false;
-                    break;
-            }
-        }
-        return true;
-    }
 
-    private boolean checkDateFormat(String date) {
-        if (date.length() != Constrain.DateFormat.length())
-            return false;
-        for (int i = 0; i < date.length(); i++) {
-            switch (i) {
-                case 4:
-                case 7:
-                    if (date.toCharArray()[i] != '-')
-                        return false;
-                    break;
-                default:
-                    if (!Character.isDigit(date.toCharArray()[i]))
-                        return false;
-                    break;
-            }
-        }
-        return true;
-    }
 
     public ResultDTO addFriend(int uid, int fid, String createTime) {
         ResultDTO res = new ResultDTO();
 
-        if (!checkDateFormat(createTime)) {
+        if (!Convert.checkDateFormat(createTime)) {
             throw new IllegalArgumentException("DateFomat error");
         }
         if (uid == fid) {

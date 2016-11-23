@@ -16,4 +16,6 @@ public interface WhiteListDao extends CrudRepository<WhiteList, Long>{
     List<WhiteList> findAllByValid(int valid);
 
     WhiteList findByIpAndValid(String ip, int valid);
+
+    WhiteList findByIdAndValid(int id, int valid);
 }

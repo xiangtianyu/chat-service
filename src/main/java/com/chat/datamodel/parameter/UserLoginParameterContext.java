@@ -1,6 +1,8 @@
 package com.chat.datamodel.parameter;
 
 public class UserLoginParameterContext {
+    private int     uid;
+
     private String  username;
 
     private String  password;
@@ -19,5 +21,13 @@ public class UserLoginParameterContext {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public int getUid() {
+        return uid;
+    }
+
+    public void setUid(int uid) {
+        this.uid = uid;
     }
 }

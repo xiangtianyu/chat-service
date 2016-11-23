@@ -32,6 +32,9 @@ public class User {
     @Column(name = "createTime")
     private String createTime;
 
+    @Column(name = "salt")
+    private String salt;
+
     @Column(name = "valid")
     private int valid;
 
@@ -73,5 +76,13 @@ public class User {
 
     public void setValid(int valid) {
         this.valid = valid;
+    }
+
+    public String getSalt() {
+        return salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
     }
 }

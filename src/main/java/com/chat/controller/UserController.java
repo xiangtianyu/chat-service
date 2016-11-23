@@ -1,5 +1,6 @@
 package com.chat.controller;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.*;
@@ -39,20 +40,26 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "/user/register", method = RequestMethod.POST)
-    public @ResponseBody ResultDTO uRegister(@RequestBody UserRegisterParameterContext userRegisterParameterContext) throws ParseException {
+    public @ResponseBody ResultDTO uRegister(@RequestBody UserRegisterParameterContext userRegisterParameterContext) throws ParseException, NoSuchAlgorithmException {
         return userService.uRegister(userRegisterParameterContext.getUsername(),
                 userRegisterParameterContext.getPassword(), userRegisterParameterContext.getCreateTime());
     }
 
     @RequestMapping(value = "/user/login", method = RequestMethod.POST)
-    public @ResponseBody ResultDTO uLogin(@RequestBody UserLoginParameterContext userLoginParameterContext) throws ParseException {
+    public @ResponseBody ResultDTO uLogin(@RequestBody UserLoginParameterContext userLoginParameterContext) throws ParseException, NoSuchAlgorithmException {
         return userService.uLogin(userLoginParameterContext.getUsername(),
+                userLoginParameterContext.getPassword());
+    }
+
+    @RequestMapping(value = "/user/update", method = RequestMethod.POST)
+    public @ResponseBody ResultDTO uUpdate(@RequestBody UserLoginParameterContext userLoginParameterContext) throws ParseException, NoSuchAlgorithmException {
+        return userService.uUpdate(userLoginParameterContext.getUid(),
                 userLoginParameterContext.getPassword());
     }
 
     @WhiteList()
     @RequestMapping(value = "/user/delete", method = RequestMethod.GET)
-    public @ResponseBody ResultDTO uDelete(int uid) {
+    public @ResponseBody ResultDTO uDelete(int uid, HttpServletRequest request) {
         return userService.uDelete(uid);
     }
 
@@ -70,7 +77,7 @@ public class UserController extends BaseController {
 
     @WhiteList()
     @RequestMapping(value = "/friend/getFriends", method = RequestMethod.GET)
-    public @ResponseBody List<UserInfoDTO> getFriends(int uid) {
+    public @ResponseBody List<UserInfoDTO> getFriends(int uid, HttpServletRequest request) {
         return userService.getFriends(uid);
     }
 
