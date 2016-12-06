@@ -14,7 +14,6 @@ import com.chat.datamodel.dto.ResultDTO;
 import com.chat.datamodel.domain.User;
 
 import com.chat.datamodel.dto.UserInfoDTO;
-import com.sun.org.apache.xml.internal.security.algorithms.JCEMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
