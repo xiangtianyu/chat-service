@@ -5,6 +5,8 @@ package com.chat.assist;
  */
 
 
+import com.chat.util.Constrain;
+import com.chat.util.Convert;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -43,7 +45,7 @@ public class WhiteListContract {
                 throw new WhiteListException("方法中缺失HttpServletRequest参数");
             }
 
-            String ip = getIpAddr(request);
+            String ip = Convert.getIpAddr(request);
             WhiteList whiteList = whiteListDao.findByIpAndValid(ip, 1);
             Date now = new Date();
             if (whiteList == null) {
@@ -59,20 +61,6 @@ public class WhiteListContract {
         catch (Exception e) {
             logger.error("发生异常: ", e);
         }
-    }
-
-    private String getIpAddr(HttpServletRequest request) {
-        String ip = request.getHeader("x-forwarded-for");
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("Proxy-Client-IP");
-        }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
-        }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
-        }
-        return ip;
     }
 
     private boolean isDateInTime(Date date, String sTime, String eTime) throws ParseException{

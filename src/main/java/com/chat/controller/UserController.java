@@ -46,9 +46,14 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "/user/login", method = RequestMethod.POST)
-    public @ResponseBody ResultDTO uLogin(@RequestBody UserLoginParameterContext userLoginParameterContext) throws ParseException, NoSuchAlgorithmException {
+    public @ResponseBody ResultDTO uLogin(@RequestBody UserLoginParameterContext userLoginParameterContext, HttpServletRequest request) throws ParseException, NoSuchAlgorithmException {
         return userService.uLogin(userLoginParameterContext.getUsername(),
-                userLoginParameterContext.getPassword());
+                userLoginParameterContext.getPassword(), request);
+    }
+
+    @RequestMapping(value = "/user/logout", method = RequestMethod.GET)
+    public @ResponseBody ResultDTO uLogout(int uid) {
+        return userService.uLogout(uid);
     }
 
     @RequestMapping(value = "/user/update", method = RequestMethod.POST)

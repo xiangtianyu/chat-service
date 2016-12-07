@@ -14,13 +14,18 @@ import com.chat.datamodel.dto.ResultDTO;
 import com.chat.datamodel.domain.User;
 
 import com.chat.datamodel.dto.UserInfoDTO;
+import com.chat.util.RedisUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.chat.util.Convert;
 import com.chat.util.Constrain;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 @Service
 public class UserService extends BaseService {
@@ -30,6 +35,9 @@ public class UserService extends BaseService {
 
     @Autowired
     private UserRelationDao         userRelationDao;
+
+    @Autowired
+    private RedisUtils              redisUtils;
 
 
     public List<UserDTO> findAllUser() {
@@ -110,7 +118,7 @@ public class UserService extends BaseService {
         return res;
     }
 
-    public ResultDTO uLogin(String username, String password) throws NoSuchAlgorithmException{
+    public ResultDTO uLogin(String username, String password, HttpServletRequest request) throws NoSuchAlgorithmException{
         ResultDTO res = new ResultDTO();
         User user = userDao.findUserByUserNameAndValid(username, 1);
 
@@ -139,7 +147,25 @@ public class UserService extends BaseService {
         res.setResult(0);
         res.setMessage("登录成功");
         res.setUid(user.getUserId());
+
+        HttpSession session = request.getSession();
+        Date now = new Date();
+        String ip = Convert.getIpAddr(request);
+        session.setAttribute("username", username);
+        session.setAttribute("loginTime", now);
+        session.setAttribute("ip", ip);
+        String sessionId = session.getId();
+        session.setMaxInactiveInterval(3600*24*7);
+        redisUtils.setDay(Integer.toString(user.getUserId()), sessionId, 7);
         return res;
+    }
+
+    public ResultDTO uLogout(int uid) {
+        ResultDTO resultDTO = new ResultDTO();
+        redisUtils.remove(Integer.toString(uid));
+        resultDTO.setResult(0);
+        resultDTO.setMessage("logout success");
+        return resultDTO;
     }
 
     public ResultDTO uDelete(int uid) {

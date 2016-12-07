@@ -9,6 +9,8 @@ import com.chat.datamodel.domain.WhiteList;
 import com.chat.datamodel.dto.UserDTO;
 import com.chat.datamodel.dto.WhiteListDTO;
 
+import javax.servlet.http.HttpServletRequest;
+
 public class Convert {
     public static UserDTO convertUserFromDomain (User user) {
         UserDTO userDTO = new UserDTO();
@@ -116,5 +118,19 @@ public class Convert {
         byte[] salt = new byte[Constrain.SaltSize];
         random.nextBytes(salt);
         return salt;
+    }
+
+    public static String getIpAddr(HttpServletRequest request) {
+        String ip = request.getHeader("x-forwarded-for");
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+        return ip;
     }
 }
