@@ -144,27 +144,48 @@ public class UserService extends BaseService {
             return res;
         }
 
-        res.setResult(0);
-        res.setMessage("登录成功");
-        res.setUid(user.getUserId());
+
+        String uid = Integer.toString(user.getUserId());
 
         HttpSession session = request.getSession();
-        Date now = new Date();
-        String ip = Convert.getIpAddr(request);
-        session.setAttribute("username", username);
-        session.setAttribute("loginTime", now);
-        session.setAttribute("ip", ip);
         String sessionId = session.getId();
-        session.setMaxInactiveInterval(3600*24*7);
-        redisUtils.setDay(Integer.toString(user.getUserId()), sessionId, 7);
+        if (redisUtils.exists(uid) && !redisUtils.get(uid).toString().equals(sessionId)) {
+            res.setResult(3);
+            res.setMessage("该帐号已经登录");
+            res.setUid(user.getUserId());
+        }
+        else {
+            Date now = new Date();
+            String ip = Convert.getIpAddr(request);
+            session.setAttribute("uid", user.getUserId());
+            session.setAttribute("username", username);
+            session.setAttribute("loginTime", now);
+            session.setAttribute("ip", ip);
+            session.setMaxInactiveInterval(3600*24*7);
+            redisUtils.setDay(uid, sessionId, 7);
+
+            res.setResult(0);
+            res.setMessage("登录成功");
+            res.setUid(user.getUserId());
+        }
+
         return res;
     }
 
-    public ResultDTO uLogout(int uid) {
+    public ResultDTO uLogout(int uid, HttpServletRequest request) {
         ResultDTO resultDTO = new ResultDTO();
-        redisUtils.remove(Integer.toString(uid));
-        resultDTO.setResult(0);
-        resultDTO.setMessage("logout success");
+        String id = Integer.toString(uid);
+        HttpSession session = request.getSession();
+        if (redisUtils.exists(id) && redisUtils.get(id).toString().equals(session.getId())) {
+            redisUtils.remove(Integer.toString(uid));
+            resultDTO.setResult(0);
+            resultDTO.setMessage("logout success");
+        }
+        else {
+            resultDTO.setResult(1);
+            resultDTO.setMessage("logout failure");
+        }
+
         return resultDTO;
     }
 

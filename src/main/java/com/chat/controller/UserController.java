@@ -52,8 +52,8 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "/user/logout", method = RequestMethod.GET)
-    public @ResponseBody ResultDTO uLogout(int uid) {
-        return userService.uLogout(uid);
+    public @ResponseBody ResultDTO uLogout(int uid, HttpServletRequest request) {
+        return userService.uLogout(uid, request);
     }
 
     @RequestMapping(value = "/user/update", method = RequestMethod.POST)
