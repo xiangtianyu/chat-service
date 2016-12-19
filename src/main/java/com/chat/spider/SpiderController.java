@@ -1,5 +1,6 @@
 package com.chat.spider;
 
+import com.chat.datamodel.dao.ChapterDao;
 import edu.uci.ics.crawler4j.crawler.CrawlConfig;
 import edu.uci.ics.crawler4j.crawler.CrawlController;
 import edu.uci.ics.crawler4j.fetcher.PageFetcher;
@@ -9,6 +10,7 @@ import org.apache.http.Header;
 import org.apache.http.HeaderElement;
 import org.apache.http.ParseException;
 import org.apache.http.message.BasicHeader;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -23,6 +25,9 @@ import java.util.List;
 @CrossOrigin
 @RestController
 public class SpiderController {
+    @Autowired
+    private ChapterDao chapterDao;
+
     @RequestMapping(value = "/spider", method = RequestMethod.GET)
     public void StartSpider() throws Exception{
         String crawlStorageFolder = "/data/crawl/root";
@@ -66,6 +71,6 @@ public class SpiderController {
          * Start the crawl. This is a blocking operation, meaning that your code
          * will reach the line after this only when crawling is finished.
          */
-        controller.start(MyCrawler.class, numberOfCrawlers);
+        controller.start(new MyCrawlerFactory(chapterDao), numberOfCrawlers);
     }
 }

@@ -27,8 +27,8 @@ public class Chapter {
     @Column(name = "title")
     private String title;
 
-    @Column(name = "index")
-    private String index;
+    @Column(name = "cIndex")
+    private int    cIndex;
 
     @Column(name = "bookName")
     private String bookName;
@@ -41,12 +41,12 @@ public class Chapter {
         this.bookName = bookName;
     }
 
-    public String getIndex() {
-        return index;
+    public int getcIndex() {
+        return cIndex;
     }
 
-    public void setIndex(String index) {
-        this.index = index;
+    public void setcIndex(int cIndex) {
+        this.cIndex = cIndex;
     }
 
     public int getId() {
