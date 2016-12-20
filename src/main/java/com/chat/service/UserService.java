@@ -24,7 +24,9 @@ import org.springframework.stereotype.Service;
 import com.chat.util.Convert;
 import com.chat.util.Constrain;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 @Service
@@ -52,7 +54,8 @@ public class UserService extends BaseService {
         return alluser;
     }
 
-    public ResultDTO uRegister(String username, String password, String createTime) throws NoSuchAlgorithmException{
+    public ResultDTO uRegister(String username, String password, String createTime,
+                               HttpServletRequest request, HttpServletResponse response) throws NoSuchAlgorithmException{
         ResultDTO res = new ResultDTO();
         MessageDigest sha256Digest = MessageDigest.getInstance("SHA-256");
         byte[] rSalt = Convert.createRandomSalt();
@@ -80,16 +83,35 @@ public class UserService extends BaseService {
         user.setValid(1);
         userDao.save(user);
 
+//        String uid = Integer.toString(user.getUserId());
+//        HttpSession session = request.getSession();
+//        String sessionId = session.getId();
+//        if (redisUtils.exists(uid)) {
+//            redisUtils.remove(uid);
+//        }
+//        Date now = new Date();
+//        String ip = Convert.getIpAddr(request);
+//        session.setAttribute("uid", user.getUserId());
+//        session.setAttribute("username", username);
+//        session.setAttribute("loginTime", now);
+//        session.setAttribute("ip", ip);
+//        session.setMaxInactiveInterval(3600*24*7);
+//        redisUtils.setDay(uid, sessionId, 7);
+//        Cookie cookie = new Cookie("CUSER", sessionId);
+//        cookie.setMaxAge(3600*24*7);
+//        response.addCookie(cookie);
+
         res.setResult(0);
         res.setMessage("用户创建成功");
         res.setUid(userDao.findUserByUserNameAndValid(username, 1).getUserId());
         return res;
     }
 
-    public ResultDTO uUpdate(int uid, String password) throws NoSuchAlgorithmException{
+    public ResultDTO uChangePassword(int id, String username, String password, HttpServletRequest request,
+                                     HttpServletResponse response) throws NoSuchAlgorithmException{
         ResultDTO res = new ResultDTO();
 
-        User user = userDao.findUserByUserIdAndValid(uid, 1);
+        User user = userDao.findUserByUserIdAndValid(id, 1);
 
         MessageDigest sha256Digest = MessageDigest.getInstance("SHA-256");
         byte[] rSalt = Convert.createRandomSalt();
@@ -107,6 +129,24 @@ public class UserService extends BaseService {
             return res;
         }
 
+//        String uid = Integer.toString(id);
+//        HttpSession session = request.getSession();
+//        String sessionId = session.getId();
+//        if (redisUtils.exists(uid)) {
+//            redisUtils.remove(uid);
+//        }
+//        Date now = new Date();
+//        String ip = Convert.getIpAddr(request);
+//        session.setAttribute("uid", user.getUserId());
+//        session.setAttribute("username", username);
+//        session.setAttribute("loginTime", now);
+//        session.setAttribute("ip", ip);
+//        session.setMaxInactiveInterval(3600*24*7);
+//        redisUtils.setDay(uid, sessionId, 7);
+//        Cookie cookie = new Cookie("CUSER", sessionId);
+//        cookie.setMaxAge(3600*24*7);
+//        response.addCookie(cookie);
+
         user.setPassWord(shaPW);
         user.setSalt(sSalt);
         user.setValid(1);
@@ -114,11 +154,12 @@ public class UserService extends BaseService {
 
         res.setResult(0);
         res.setMessage("用户更新成功");
-        res.setUid(uid);
+        res.setUid(id);
         return res;
     }
 
-    public ResultDTO uLogin(String username, String password, HttpServletRequest request) throws NoSuchAlgorithmException{
+    public ResultDTO uLogin(String username, String password, HttpServletRequest request,
+                            HttpServletResponse response) throws NoSuchAlgorithmException{
         ResultDTO res = new ResultDTO();
         User user = userDao.findUserByUserNameAndValid(username, 1);
 
@@ -149,42 +190,69 @@ public class UserService extends BaseService {
 
         HttpSession session = request.getSession();
         String sessionId = session.getId();
-        if (redisUtils.exists(uid) && !redisUtils.get(uid).toString().equals(sessionId)) {
+        if (redisUtils.exists(uid)) {
             res.setResult(3);
             res.setMessage("该帐号已经登录");
             res.setUid(user.getUserId());
+            return res;
         }
-        else {
-            Date now = new Date();
-            String ip = Convert.getIpAddr(request);
-            session.setAttribute("uid", user.getUserId());
-            session.setAttribute("username", username);
-            session.setAttribute("loginTime", now);
-            session.setAttribute("ip", ip);
-            session.setMaxInactiveInterval(3600*24*7);
-            redisUtils.setDay(uid, sessionId, 7);
+        Date now = new Date();
+        String ip = Convert.getIpAddr(request);
+        session.setAttribute("uid", user.getUserId());
+        session.setAttribute("username", username);
+        session.setAttribute("loginTime", now);
+        session.setAttribute("ip", ip);
+        session.setMaxInactiveInterval(3600*24*7);
+        redisUtils.setDay(uid, sessionId, 7);
+        Cookie cookie = new Cookie("CUSER", sessionId);
+        cookie.setMaxAge(3600*24*7);
+        response.addCookie(cookie);
 
-            res.setResult(0);
-            res.setMessage("登录成功");
-            res.setUid(user.getUserId());
-        }
+        res.setResult(0);
+        res.setMessage("登录成功");
+        res.setUid(user.getUserId());
 
         return res;
     }
 
-    public ResultDTO uLogout(int uid, HttpServletRequest request) {
+    public ResultDTO checkLogin(String uid, HttpServletRequest request) {
+        ResultDTO resultDTO = new ResultDTO();
+        Cookie[] cookies = request.getCookies();
+        String sid = Convert.getCookie(cookies, "CUSER");
+        if (!sid.equals("")) {
+            if (redisUtils.exists(uid)) {
+                if (redisUtils.get(uid).toString().equals(sid)) {
+                    resultDTO.setResult(0);
+                    resultDTO.setMessage("login");
+                    return resultDTO;
+                }
+                else {
+                    resultDTO.setResult(2);
+                    resultDTO.setMessage("someone else has logon!");
+                    return resultDTO;
+                }
+            }
+        }
+        resultDTO.setResult(1);
+        resultDTO.setMessage("not login");
+        return resultDTO;
+    }
+
+    public ResultDTO uLogout(int uid, HttpServletRequest request, HttpServletResponse response) {
         ResultDTO resultDTO = new ResultDTO();
         String id = Integer.toString(uid);
-        HttpSession session = request.getSession();
-        if (redisUtils.exists(id) && redisUtils.get(id).toString().equals(session.getId())) {
-            redisUtils.remove(Integer.toString(uid));
-            resultDTO.setResult(0);
-            resultDTO.setMessage("logout success");
+        Cookie[] cookies = request.getCookies();
+        String sid = Convert.getCookie(cookies, "CUSER");
+        if (!sid.equals("")) {
+            if (redisUtils.exists(id) && redisUtils.get(id).toString().equals(sid)) {
+                redisUtils.remove(Integer.toString(uid));
+                resultDTO.setResult(0);
+                resultDTO.setMessage("logout success");
+                return resultDTO;
+            }
         }
-        else {
-            resultDTO.setResult(1);
-            resultDTO.setMessage("logout failure");
-        }
+        resultDTO.setResult(1);
+        resultDTO.setMessage("logout failure");
 
         return resultDTO;
     }

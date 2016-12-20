@@ -8,7 +8,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import com.chat.datamodel.domain.User;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface UserDao extends CrudRepository<User, Long> {
     List<User> findAllByValid(int valid);
 

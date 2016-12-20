@@ -9,6 +9,7 @@ import com.chat.datamodel.domain.WhiteList;
 import com.chat.datamodel.dto.UserDTO;
 import com.chat.datamodel.dto.WhiteListDTO;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 public class Convert {
@@ -132,5 +133,14 @@ public class Convert {
             ip = request.getRemoteAddr();
         }
         return ip;
+    }
+
+    public static String getCookie(Cookie[] cookies, String cookie) {
+        for (Cookie c : cookies) {
+            if (c.getName().equals(cookie)) {
+                return c.getValue();
+            }
+        }
+        return "";
     }
 }
