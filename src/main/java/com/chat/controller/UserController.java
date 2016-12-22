@@ -48,8 +48,8 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "/user/checklogin", method = RequestMethod.GET)
-    public @ResponseBody ResultDTO checklogin(String uid, HttpServletRequest request) {
-        return userService.checkLogin(uid, request);
+    public @ResponseBody ResultDTO checklogin(HttpServletRequest request) {
+        return userService.checkLogin(request);
     }
 
     @RequestMapping(value = "/user/login", method = RequestMethod.POST)
@@ -60,8 +60,8 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "/user/logout", method = RequestMethod.GET)
-    public @ResponseBody ResultDTO uLogout(int uid, HttpServletRequest request, HttpServletResponse response) {
-        return userService.uLogout(uid, request, response);
+    public @ResponseBody ResultDTO uLogout(HttpServletRequest request, HttpServletResponse response) {
+        return userService.uLogout(request, response);
     }
 
     @RequestMapping(value = "/user/changePassword", method = RequestMethod.POST)

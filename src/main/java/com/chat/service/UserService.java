@@ -83,24 +83,6 @@ public class UserService extends BaseService {
         user.setValid(1);
         userDao.save(user);
 
-//        String uid = Integer.toString(user.getUserId());
-//        HttpSession session = request.getSession();
-//        String sessionId = session.getId();
-//        if (redisUtils.exists(uid)) {
-//            redisUtils.remove(uid);
-//        }
-//        Date now = new Date();
-//        String ip = Convert.getIpAddr(request);
-//        session.setAttribute("uid", user.getUserId());
-//        session.setAttribute("username", username);
-//        session.setAttribute("loginTime", now);
-//        session.setAttribute("ip", ip);
-//        session.setMaxInactiveInterval(3600*24*7);
-//        redisUtils.setDay(uid, sessionId, 7);
-//        Cookie cookie = new Cookie("CUSER", sessionId);
-//        cookie.setMaxAge(3600*24*7);
-//        response.addCookie(cookie);
-
         res.setResult(0);
         res.setMessage("用户创建成功");
         res.setUid(userDao.findUserByUserNameAndValid(username, 1).getUserId());
@@ -128,24 +110,6 @@ public class UserService extends BaseService {
             res.setUid(-1);
             return res;
         }
-
-//        String uid = Integer.toString(id);
-//        HttpSession session = request.getSession();
-//        String sessionId = session.getId();
-//        if (redisUtils.exists(uid)) {
-//            redisUtils.remove(uid);
-//        }
-//        Date now = new Date();
-//        String ip = Convert.getIpAddr(request);
-//        session.setAttribute("uid", user.getUserId());
-//        session.setAttribute("username", username);
-//        session.setAttribute("loginTime", now);
-//        session.setAttribute("ip", ip);
-//        session.setMaxInactiveInterval(3600*24*7);
-//        redisUtils.setDay(uid, sessionId, 7);
-//        Cookie cookie = new Cookie("CUSER", sessionId);
-//        cookie.setMaxAge(3600*24*7);
-//        response.addCookie(cookie);
 
         user.setPassWord(shaPW);
         user.setSalt(sSalt);
@@ -205,8 +169,11 @@ public class UserService extends BaseService {
         session.setMaxInactiveInterval(3600*24*7);
         redisUtils.setDay(uid, sessionId, 7);
         Cookie cookie = new Cookie("CUSER", sessionId);
+        Cookie cookie2 = new Cookie("USERID", uid);
         cookie.setMaxAge(3600*24*7);
+        cookie2.setMaxAge(3600*24*7);
         response.addCookie(cookie);
+        response.addCookie(cookie2);
 
         res.setResult(0);
         res.setMessage("登录成功");
@@ -215,11 +182,12 @@ public class UserService extends BaseService {
         return res;
     }
 
-    public ResultDTO checkLogin(String uid, HttpServletRequest request) {
+    public ResultDTO checkLogin(HttpServletRequest request) {
         ResultDTO resultDTO = new ResultDTO();
         Cookie[] cookies = request.getCookies();
         String sid = Convert.getCookie(cookies, "CUSER");
-        if (!sid.equals("")) {
+        String uid = Convert.getCookie(cookies, "USERID");
+        if (!sid.equals("") && !uid.equals("")) {
             if (redisUtils.exists(uid)) {
                 if (redisUtils.get(uid).toString().equals(sid)) {
                     resultDTO.setResult(0);
@@ -238,14 +206,14 @@ public class UserService extends BaseService {
         return resultDTO;
     }
 
-    public ResultDTO uLogout(int uid, HttpServletRequest request, HttpServletResponse response) {
+    public ResultDTO uLogout(HttpServletRequest request, HttpServletResponse response) {
         ResultDTO resultDTO = new ResultDTO();
-        String id = Integer.toString(uid);
         Cookie[] cookies = request.getCookies();
         String sid = Convert.getCookie(cookies, "CUSER");
+        String uid = Convert.getCookie(cookies, "USERID");
         if (!sid.equals("")) {
-            if (redisUtils.exists(id) && redisUtils.get(id).toString().equals(sid)) {
-                redisUtils.remove(Integer.toString(uid));
+            if (redisUtils.exists(uid) && redisUtils.get(uid).toString().equals(sid)) {
+                redisUtils.remove(uid);
                 resultDTO.setResult(0);
                 resultDTO.setMessage("logout success");
                 return resultDTO;
