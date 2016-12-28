@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import com.chat.util.Convert;
 import com.chat.util.Constrain;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -54,6 +55,7 @@ public class UserService extends BaseService {
         return alluser;
     }
 
+    @Transactional
     public ResultDTO uRegister(String username, String password, String createTime,
                                HttpServletRequest request, HttpServletResponse response) throws NoSuchAlgorithmException{
         ResultDTO res = new ResultDTO();
@@ -86,9 +88,20 @@ public class UserService extends BaseService {
         res.setResult(0);
         res.setMessage("用户创建成功");
         res.setUid(userDao.findUserByUserNameAndValid(username, 1).getUserId());
+
+
+        Cookie cookie = new Cookie("CUSER", "");
+        Cookie cookie2 = new Cookie("USERID", "");
+        cookie.setMaxAge(0);
+        cookie2.setMaxAge(0);
+        cookie.setPath("/");
+        cookie2.setPath("/");
+        response.addCookie(cookie);
+        response.addCookie(cookie2);
         return res;
     }
 
+    @Transactional
     public ResultDTO uChangePassword(int id, String username, String password, HttpServletRequest request,
                                      HttpServletResponse response) throws NoSuchAlgorithmException{
         ResultDTO res = new ResultDTO();
@@ -119,6 +132,15 @@ public class UserService extends BaseService {
         res.setResult(0);
         res.setMessage("用户更新成功");
         res.setUid(id);
+
+        Cookie cookie = new Cookie("CUSER", "");
+        Cookie cookie2 = new Cookie("USERID", "");
+        cookie.setMaxAge(0);
+        cookie2.setMaxAge(0);
+        cookie.setPath("/");
+        cookie2.setPath("/");
+        response.addCookie(cookie);
+        response.addCookie(cookie2);
         return res;
     }
 
@@ -172,6 +194,8 @@ public class UserService extends BaseService {
         Cookie cookie2 = new Cookie("USERID", uid);
         cookie.setMaxAge(3600*24*7);
         cookie2.setMaxAge(3600*24*7);
+        cookie.setPath("/");
+        cookie2.setPath("/");
         response.addCookie(cookie);
         response.addCookie(cookie2);
 
@@ -216,6 +240,14 @@ public class UserService extends BaseService {
                 redisUtils.remove(uid);
                 resultDTO.setResult(0);
                 resultDTO.setMessage("logout success");
+                Cookie cookie = new Cookie("CUSER", "");
+                Cookie cookie2 = new Cookie("USERID", "");
+                cookie.setMaxAge(0);
+                cookie2.setMaxAge(0);
+                cookie.setPath("/");
+                cookie2.setPath("/");
+                response.addCookie(cookie);
+                response.addCookie(cookie2);
                 return resultDTO;
             }
         }
@@ -225,6 +257,7 @@ public class UserService extends BaseService {
         return resultDTO;
     }
 
+    @Transactional
     public ResultDTO uDelete(int uid) {
         ResultDTO res = new ResultDTO();
         User user = userDao.findUserByUserIdAndValid(uid, 1);
@@ -244,7 +277,7 @@ public class UserService extends BaseService {
     }
 
 
-
+    @Transactional
     public ResultDTO addFriend(int uid, int fid, String createTime) {
         ResultDTO res = new ResultDTO();
 
@@ -288,6 +321,7 @@ public class UserService extends BaseService {
         return res;
     }
 
+    @Transactional
     public ResultDTO deleteFriend(int uid, int fid) {
         ResultDTO res = new ResultDTO();
 

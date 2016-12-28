@@ -1,12 +1,14 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Hello WebSocket</title>
+    <meta charset="UTF-8">
+    <title>websocket</title>
 
     <script src="http://cdn.bootcss.com/stomp.js/2.3.3/stomp.min.js"></script>
     <script src="http://cdn.jsdelivr.net/sockjs/1/sockjs.min.js"></script>
     <script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
-    <script src="app.js"></script>
+    <script src="http://apps.bdimg.com/libs/jquery.cookie/1.4.1/jquery.cookie.js"></script>
+    <script src="webSocket.js"></script>
 </head>
 <body>
 <noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being
@@ -27,7 +29,9 @@
         <div class="col-md-6">
             <form class="form-inline">
                 <div class="form-group">
-                    <label for="message">What is your name?</label>
+                    <label for="uid">What is your uid to send?</label>
+                    <input type="text" id="uid" class="form-control" placeholder="Your uid here...">
+                    <label for="message">What is your message?</label>
                     <input type="text" id="message" class="form-control" placeholder="Your message here...">
                     <label for="username">What is your name?</label>
                     <input type="text" id="username" class="form-control" placeholder="Your name here...">

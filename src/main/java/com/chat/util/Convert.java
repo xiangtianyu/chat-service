@@ -143,4 +143,12 @@ public class Convert {
         }
         return "";
     }
+
+    public static String encodeStr(String str) {
+        return str;
+    }
+
+    public static String decodeStr(String str) {
+        return str;
+    }
 }

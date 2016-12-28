@@ -4,7 +4,7 @@ package com.chat.websocket;
  * Created by xiangtianyu on 2016/12/6.
  */
 public class Message {
-    private int     userId;
+    private String  userId;
 
     private String  userName;
 
@@ -12,11 +12,11 @@ public class Message {
 
     private String  sendTime;
 
-    public int getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 
