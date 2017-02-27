@@ -12,13 +12,13 @@ public class AVLTree {
         private int key;
         private TreeNode left;
         private TreeNode right;
-        private TreeNode parent;
+        private int height;
 
-        public TreeNode(int key, TreeNode left, TreeNode right, TreeNode parent) {
+        public TreeNode(int key, TreeNode left, TreeNode right) {
             this.key = key;
             this.left = left;
             this.right = right;
-            this.parent = parent;
+            this.height = 0;
         }
 
         public int getKey() {
@@ -30,6 +30,13 @@ public class AVLTree {
             String rkey = (right == null) ? "" : Integer.toString(right.key);
             return "(" + lkey + "," + key + "," + rkey + ")";
         }
+    }
+
+    private int getNodeHeight(TreeNode node) {
+        if (node != null) {
+            return node.height;
+        }
+        return 0;
     }
 
     private TreeNode treeNode = null;
@@ -45,5 +52,43 @@ public class AVLTree {
             }
         }
         return node;
+    }
+
+    private TreeNode llRotation (TreeNode node) {
+        TreeNode n = node.left;
+        node.left = n.right;
+        n.right = node;
+
+        node.height = Math.max(node.left.height, node.right.height) + 1;
+        n.height = Math.max(n.left.height, n.right.height) + 1;
+
+        return n;
+    }
+
+    private TreeNode rrRotation (TreeNode node) {
+        TreeNode n = node.right;
+        node.right = n.left;
+        n.left = node;
+
+        node.height = Math.max(node.left.height, node.right.height) + 1;
+        n.height = Math.max(n.left.height, n.right.height) + 1;
+
+        return n;
+    }
+
+    private TreeNode rlRotation (TreeNode node) {
+        node.right = llRotation(node.right);
+
+        return rrRotation(node);
+    }
+
+    private TreeNode lrRotation (TreeNode node) {
+        node.left = rrRotation(node.left);
+
+        return llRotation(node);
+    }
+
+    public void insert (int key) {
+
     }
 }
